@@ -15,11 +15,23 @@
         private $model;
 
         /**
+         * @var int
+         */
+        private $max_size;
+
+        /**
+         * @var bool
+         */
+        private $remove_less_frequent;
+
+        /**
          * Public Constructor
          */
         public function __construct()
         {
             $this->model = [];
+            $this->max_size = 0;
+            $this->remove_less_frequent = false;
         }
 
         /**
@@ -50,6 +62,11 @@
 
                 $this->model[$current_frame][$next_frame]++;
             }
+
+            if($this->max_size > 0)
+            {
+                $this->resizeModel();
+            }
         }
 
         /**
@@ -64,6 +81,72 @@
             foreach ($samples as $sample)
             {
                 $this->addSample($sample, $as_lower);
+            }
+        }
+
+        /**
+         * Resizes the model and removes entries according to $this->remove_less_frequent
+         * If $this->remove_less_frequent is true, the least frequently used entries are removed
+         * If $this->remove_less_frequent is false, the most frequently used entries are removed
+         *
+         * @return void
+         */
+        private function resizeModel(): void
+        {
+            if ($this->max_size == 0)
+            {
+                return;
+            }
+
+            $size = count($this->model);
+
+            if($size < $this->max_size)
+            {
+                return;
+            }
+
+            $entries = [];
+            foreach ($this->model as $current_frame => $next_frames)
+            {
+                foreach ($next_frames as $next_frame => $weight)
+                {
+                    $entries[] = [$current_frame, $next_frame, $weight];
+                }
+            }
+
+            if($this->remove_less_frequent)
+            {
+                usort($entries, function($a, $b)
+                {
+                    return $b[2] <=> $a[2];
+                });
+            }
+            else
+            {
+                usort($entries, function($a, $b)
+                {
+                    return $a[2] <=> $b[2];
+                });
+            }
+
+            while($size > $this->max_size)
+            {
+                $entry = array_shift($entries);
+                $current_frame = $entry[0];
+                $next_frame = $entry[1];
+                $weight = $entry[2];
+
+                if($weight == 0)
+                    continue;
+
+                unset($this->model[$current_frame][$next_frame]);
+                $size--;
+
+                if (count($this->model[$current_frame]) == 0)
+                {
+                    unset($this->model[$current_frame]);
+                }
+
             }
         }
 
@@ -151,7 +234,11 @@
          */
         public function export(): array
         {
-            return $this->model;
+            return [
+                'model' => $this->model,
+                'max_size' => $this->max_size,
+                'remove_less_frequent' => $this->remove_less_frequent
+            ];
         }
 
         /**
@@ -163,7 +250,9 @@
         public static function import(array $data): MarkovChains
         {
             $generator = new MarkovChains();
-            $generator->model = $data;
+            $generator->model = $data['model'] ?? [];
+            $generator->max_size = $data['max_size'] ?? 0;
+            $generator->remove_less_frequent = $data['remove_less_frequent'] ?? false;
             return $generator;
         }
 
@@ -176,6 +265,54 @@
         public function getModel(): array
         {
             return $this->model;
+        }
+
+        /**
+         * Returns the maximum size of the model (0 = no limit) default: 0
+         *
+         * @return int
+         * @noinspection PhpUnused
+         */
+        public function getMaxSize(): int
+        {
+            return $this->max_size;
+        }
+
+        /**
+         * Sets the maximum size of the model (0 = no limit) default: 0
+         *
+         * @param int $max_size
+         * @noinspection PhpUnused
+         */
+        public function setMaxSize(int $max_size): void
+        {
+            $this->max_size = $max_size;
+        }
+
+        /**
+         * Tells whether to remove the least or most frequently used entries when the model is full
+         * If true, the least frequently used entries are removed when the model is full
+         * If false, the most frequently used entries are removed when the model is full (default)
+         *
+         * @return bool
+         * @noinspection PhpUnused
+         */
+        public function isRemoveLessFrequent(): bool
+        {
+            return $this->remove_less_frequent;
+        }
+
+        /**
+         * Set whether to remove the least or most frequently used entries when the model is full
+         * If true, the least frequently used entries are removed when the model is full
+         * If false, the most frequently used entries are removed when the model is full (default)
+         *
+         * @param bool $remove_less_frequent
+         * @noinspection PhpUnused
+         */
+        public function setRemoveLessFrequent(bool $remove_less_frequent): void
+        {
+            $this->remove_less_frequent = $remove_less_frequent;
         }
 
     }
