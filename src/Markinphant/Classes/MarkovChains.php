@@ -41,7 +41,7 @@
          * @param bool $as_lower Whether to convert the sample to lowercase
          * @return void
          */
-        public function addSample(string $sample, bool $as_lower=true): void
+        public function addSample(string $sample, bool $as_lower=false): void
         {
             $frames = Utilities::sampleToFrames($sample, $as_lower);
 

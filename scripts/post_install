@@ -1,0 +1,17 @@
+<?php
+
+    require 'ncc';
+    import('com.netkas.markinphant');
+
+    print('Updating configuration file...' . PHP_EOL);
+
+    try
+    {
+        \Markinphant\Classes\Utilities::getConfiguration();
+        print('Done!' . PHP_EOL);
+    }
+    catch(Exception $e)
+    {
+        print(sprintf('Error: %s', $e->getMessage()) > PHP_EOL);
+    }
+

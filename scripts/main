@@ -1,0 +1,7 @@
+<?php
+
+    require 'ncc';
+    import('com.netkas.markinphant');
+
+    $bot = new \Markinphant\Bot();
+    $bot->main();

@@ -5,31 +5,86 @@
             "minimum_version": "8.0",
             "maximum_version": "8.2"
         },
-        "options": []
+        "update_source": {
+            "source": "netkas/markinphant@n64",
+            "repository": {
+                "name": "n64",
+                "type": "gitlab",
+                "host": "git.n64.cc",
+                "ssl": true
+            }
+        },
+        "options": {
+            "create_symlink": true
+        }
     },
     "assembly": {
         "name": "Markinphant Telegram Bot",
         "package": "com.netkas.markinphant",
+        "copyright": "© 2023 Netkas",
+        "description": "Markinphant Telegram Bot learns to chat from your group chat.",
         "version": "1.0.0",
         "uuid": "b2461c08-b16a-11ed-b265-9bb1316a9b6e"
     },
+    "execution_policies":[
+        {
+            "name": "post_install",
+            "runner": "php",
+            "execute": {
+                "target": "scripts/post_install",
+                "working_directory": "%CWD%",
+                "tty": true
+            }
+        },
+        {
+            "name": "main",
+            "runner": "php",
+            "execute": {
+                "target": "scripts/main",
+                "working_directory": "%CWD%",
+                "tty": true
+            }
+        }
+    ],
+    "installer": {
+        "post_install": [
+            "post_install"
+        ]
+    },
     "build": {
         "source_path": "src",
-        "default_configuration": "debug",
+        "default_configuration": "release",
+        "main": "main",
         "define_constants": {
-            "ASSEMBLY_NAME": "%ASSEMBLY.NAME%",
-            "ASSEMBLY_PACKAGE": "%ASSEMBLY.PACKAGE%",
-            "ASSEMBLY_VERSION": "%ASSEMBLY.VERSION%",
-            "ASSEMBLY_UID": "%ASSEMBLY.UID%"
+            "ASSEMBLY_VERSION": "%ASSEMBLY.VERSION%"
         },
-        "configurations": [
+        "dependencies":[
             {
-                "name": "debug",
-                "output_path": "build/debug",
-                "define_constants": {
-                    "DEBUG": "1"
-                }
+                "name": "net.nosial.loglib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.log=latest@n64"
             },
+            {
+                "name": "net.nosial.tgbotlib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.tgbot=latest@n64"
+            },
+            {
+                "name": "net.nosial.tamerlib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.tamer=latest@n64"
+            },
+            {
+                "name": "net.nosial.configlib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.config=latest@n64"
+            }
+        ],
+        "configurations": [
             {
                 "name": "release",
                 "output_path": "build/release",
