@@ -98,11 +98,13 @@
                 return;
             }
 
-            $size = count($this->model);
-
-            if($size < $this->max_size)
+            $size = 0;
+            foreach ($this->model as $current_frame => $next_frames)
             {
-                return;
+                foreach ($next_frames as $next_frame => $weight)
+                {
+                    $size++;
+                }
             }
 
             $entries = [];
