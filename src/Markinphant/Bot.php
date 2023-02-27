@@ -6,8 +6,8 @@
 
     use Exception;
     use LogLib\Log;
-    use Markinphant\Classes\Utilities;
-    use Markinphant\Commands\StartCommand;
+    use Markinphant\Classes\SessionManager;
+    use Redis;
     use TamerLib\Tamer;
 
     class Bot
@@ -23,18 +23,25 @@
         private $bot;
 
         /**
+         * @var SessionManager
+         */
+        private $session_manager;
+
+        /**
          * Public Constructor
          *
          * @throws Exception
          */
         public function __construct()
         {
-            $this->configuration = Utilities::getConfiguration();
+            $this->configuration = Classes\Factory::getConfiguration();
 
             // Initialize the bot
-            $this->bot = new \TgBotLib\Bot($this->configuration['bot']['token']);
-            $this->bot->setHost($this->configuration['bot']['host']);
-            $this->bot->setSsl((bool)$this->configuration['bot']['use_ssl'] ?? true);
+            $this->bot = Classes\Factory::initializeBot(
+                (string)$this->configuration['bot']['token'],
+                (string)$this->configuration['bot']['host'],
+                (bool)$this->configuration['bot']['use_ssl'],
+            );
 
             // Initialize Tamer (if enabled)
             /** @noinspection PhpUnnecessaryBoolCastInspection */
@@ -42,7 +49,7 @@
             {
                 Log::info('com.netkas.markinphant', 'Tamer is enabled, initializing...');
                 $tamer_config = $this->configuration['tamer'];
-                \TamerLib\Tamer::init(
+                Tamer::init(
                     (string)$tamer_config['protocol'],
                     $tamer_config['servers'],
                     $tamer_config['username'],
@@ -51,9 +58,21 @@
 
                 Tamer::addWorker(__DIR__ . DIRECTORY_SEPARATOR . 'worker', (int)$tamer_config['workers']);
             }
-            
-            // Register the commands
-            $this->bot->setCommandHandler('start', new StartCommand());
+
+            // Initialize Session Manager
+            Log::info('com.netkas.markinphant', 'Initializing Session Manager...');
+            $redis = new Redis();
+            $redis->connect(
+                $this->configuration['redis']['host'],
+                $this->configuration['redis']['port'],
+                $this->configuration['redis']['timeout']
+            );
+
+            if($this->configuration['redis']['password'] !== null)
+                $redis->auth($this->configuration['redis']['password']);
+
+            $this->session_manager = new SessionManager($redis);
+            $this->session_manager->load();
         }
 
         /**
@@ -77,15 +96,24 @@
          *
          * @return void
          */
-        public function main()
+        public function main(): void
         {
             Log::info('com.netkas.markinphant', 'Starting Markinphant Bot...');
+            $last_session_save = time();
 
             while(true)
             {
                 try
                 {
-                    $this->bot->handleGetUpdates(true);
+                    $this->bot->handleGetUpdates();
+
+                    if(time() - $last_session_save >= 15)
+                    {
+                        // Occasionally save the session from memory to disk
+                        Log::verbose('com.netkas.markinphant', 'Saving session...');
+                        $this->session_manager->save();
+                        $last_session_save = time();
+                    }
                 }
                 catch(Exception $e)
                 {
