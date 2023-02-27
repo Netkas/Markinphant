@@ -48,6 +48,7 @@ You can try out the bot by talking to [@MarkinphantBot](https://t.me/Markinphant
     * [Redis Configuration](#redis-configuration)
     * [Tamer Configuration](#tamer-configuration)
   * [Data Storage](#data-storage)
+  * [Developers Note](#developers-note)
   * [License](#license)
 <!-- TOC -->
 
@@ -166,6 +167,13 @@ of the sessions in memory.
 
  > Note: If the bot restarts, model data will be preserved but sessions will reset back to their last saved state
 
+## Developers Note
+
+Not much effort was put into this project, it was made as a mere demonstration of how to the various libraries I've
+written can be used together to create a useful application. If you want to contribute to this project, feel free to
+open a PR or an issue on the [issue tracker](https://git.n64.cc/netkas/markinphant/issues).
+
+Feature requests are also welcome, but I can't guarantee that I'll implement them.
 
 
 ## License
