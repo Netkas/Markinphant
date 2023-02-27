@@ -6,7 +6,6 @@
 
     use ConfigLib\Configuration;
     use Exception;
-    use Markinphant\Handlers\DebugCommand;
     use Markinphant\Handlers\DeleteCommand;
     use Markinphant\Handlers\ExportCommand;
     use Markinphant\Handlers\GenericMessageEvent;
