@@ -11,10 +11,32 @@ silly.
 The PHP implementation of Markov chains is based off [bit0r1n/nimkov](https://github.com/bit0r1n/nimkov) with some
 minor improvements to the implementation.
 
+## Features
+
+ - Markov chains
+ - Learn and generate messages based on the messages it receives
+ - No bs privacy, only collects data it needs to function, everything else is temporarily cached and deleted
+ - **NEW** Ability to resize the model to a smaller size to reduce memory usage
+
+## Commands
+
+ - `/start` - Start the bot
+ - `/help` - Show help message
+ - `/think` - Generate a new message
+ - `/export` - Export the model to a file
+ - `/delete` - Purge all data
+
+## Try it out
+
+You can try out the bot by talking to [@MarkinphantBot](https://t.me/MarkinphantBot) on Telegram.
+
 ## Table of contents
 
 <!-- TOC -->
 * [Markinphant Telegram Bot](#markinphant-telegram-bot)
+  * [Features](#features)
+  * [Commands](#commands)
+  * [Try it out](#try-it-out)
   * [Table of contents](#table-of-contents)
   * [Installation for dummies](#installation-for-dummies)
     * [There was an issue!](#there-was-an-issue-)
@@ -141,6 +163,9 @@ When you start the bot, the main program will initialize the session manager and
 redis server. Any changes made to the sessions while the bot is running is made in the redis server and then saved every
 minute to disk. This approach is used to ensure that workers aren't using up additional memory by keeping redundant copies
 of the sessions in memory.
+
+ > Note: If the bot restarts, model data will be preserved but sessions will reset back to their last saved state
+
 
 
 ## License
