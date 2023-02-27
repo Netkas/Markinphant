@@ -117,7 +117,7 @@
                 }
                 catch(Exception $e)
                 {
-                    Log::error('com.netkas.markinphant', 'hiccup', $e);
+                    Log::error('com.netkas.markinphant', $e->getMessage(), $e);
                 }
             }
         }
