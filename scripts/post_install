@@ -1,13 +1,15 @@
 <?php
 
-    require 'ncc';
+use Markinphant\Classes\Factory;
+
+require 'ncc';
     import('com.netkas.markinphant');
 
     print('Updating configuration file...' . PHP_EOL);
 
     try
     {
-        \Markinphant\Classes\Utilities::getConfiguration();
+        Factory::getConfiguration();
         print('Done!' . PHP_EOL);
     }
     catch(Exception $e)

@@ -1,4 +1,0 @@
-{
-  "start_command_private": "Hello, I am Markinphant, a Telegram bot that can generate text based on a sample text. You can use me by adding me to a group, I will learn from messages and randomly send a message to the group at a configurable interval.\n\nYou can find my source code at https://git.n64.cc/netkas/markinphant\nFor more information on how to configure me in groups, send /help",
-  "start_command_group": "Send /start to me privately to learn more about me!"
-}
