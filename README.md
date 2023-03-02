@@ -26,6 +26,13 @@ minor improvements to the implementation.
  - `/export` - Export the model to a file
  - `/delete` - Purge all data
 
+## Requirements
+
+ - PHP 8.0 or higher
+ - Redis Server
+ - Gearman Server (Optional for `TamerLib`, see [Tamer Configuration](#tamer-configuration))
+ - [ncc](https://git.n64.cc/nosial/ncc)
+
 ## Try it out
 
 You can try out the bot by talking to [@MarkinphantBot](https://t.me/MarkinphantBot) on Telegram.
@@ -36,13 +43,14 @@ You can try out the bot by talking to [@MarkinphantBot](https://t.me/Markinphant
 * [Markinphant Telegram Bot](#markinphant-telegram-bot)
   * [Features](#features)
   * [Commands](#commands)
+  * [Requirements](#requirements)
   * [Try it out](#try-it-out)
   * [Table of contents](#table-of-contents)
   * [Installation for dummies](#installation-for-dummies)
     * [There was an issue!](#there-was-an-issue-)
   * [Installation](#installation)
   * [Compile from source](#compile-from-source)
-  * [Requirements](#requirements)
+  * [Requirements](#requirements-1)
   * [Configuration](#configuration)
     * [Telegram Bot Configuration](#telegram-bot-configuration)
     * [Redis Configuration](#redis-configuration)
@@ -143,6 +151,7 @@ you can run the following commands:
 configlib --conf markinphant --prop tamer.enabled --value True
 configlib --conf markinphant --prop tamer.protocol --value gearman
 configlib --conf markinphant --prop tamer.port --value 4730
+configlib --conf markinphant --prop tamer.workers --value 4
 ```
 
  > Note: it is recommended to use an editor to edit the servers value, as it only accepts arrays of strings, for example `["host:port", "host:port"]`
