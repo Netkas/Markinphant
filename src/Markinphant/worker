@@ -1,1 +1,26 @@
 <?php
+
+    require 'ncc';
+    import('com.netkas.markinphant');
+
+    $bot = new \Markinphant\Bot();
+
+    if(!$bot->getConfiguration()['tamer']['enabled'] === true)
+    {
+        \LogLib\Log::error('com.netkas.markinphant', 'TamerLib is not enabled in the configuration');
+        exit(1);
+    }
+
+    \TamerLib\Tamer::addFunction('handle_update', function(\TamerLib\Objects\Job $job) use ($bot)
+    {
+        try
+        {
+            $bot->getBot()->handleUpdate(\TgBotLib\Objects\Telegram\Update::fromArray(json_decode($job->getData(), true)));
+        }
+        catch(Exception $e)
+        {
+            \LogLib\Log::error('com.netkas.markinphant', 'Error handling update job', $e);
+        }
+    });
+
+    \TamerLib\Tamer::work();

@@ -8,6 +8,7 @@
     use LogLib\Log;
     use Markinphant\Classes\SessionManager;
     use Redis;
+    use TamerLib\Objects\Task;
     use TamerLib\Tamer;
 
     class Bot
@@ -49,14 +50,22 @@
             {
                 Log::info('com.netkas.markinphant', 'Tamer is enabled, initializing...');
                 $tamer_config = $this->configuration['tamer'];
-                Tamer::init(
-                    (string)$tamer_config['protocol'],
-                    $tamer_config['servers'],
-                    $tamer_config['username'],
-                    $tamer_config['password']
-                );
 
-                Tamer::addWorker(__DIR__ . DIRECTORY_SEPARATOR . 'worker', (int)$tamer_config['workers']);
+                try
+                {
+                    Tamer::initWorker();
+                }
+                catch(Exception $e)
+                {
+                    Tamer::init(
+                        (string)$tamer_config['protocol'],
+                        $tamer_config['servers'],
+                        $tamer_config['username'],
+                        $tamer_config['password']
+                    );
+
+                    Tamer::addWorker(__DIR__ . DIRECTORY_SEPARATOR . 'worker', (int)$tamer_config['workers']);
+                }
             }
 
             // Initialize Session Manager
@@ -101,11 +110,38 @@
             Log::info('com.netkas.markinphant', 'Starting Markinphant Bot...');
             $last_session_save = time();
 
+            /** @noinspection PhpUnnecessaryBoolCastInspection */
+            if((bool)$this->configuration['tamer']['enabled'])
+            {
+                try
+                {
+                    Tamer::startWorkers();
+                }
+                catch(Exception $e)
+                {
+                    Log::error('com.netkas.markinphant', 'Cannot initialize workers with TamerLib', $e);
+                    exit(1);
+                }
+            }
+
             while(true)
             {
                 try
                 {
-                    $this->bot->handleGetUpdates();
+                    /** @noinspection PhpUnnecessaryBoolCastInspection */
+                    if((bool)$this->configuration['tamer']['enabled'])
+                    {
+                        // Handle updates with Tamer if it's enabled
+                        foreach($this->bot->getUpdates() as $update)
+                        {
+                            Tamer::do(Task::create('handle_update', json_encode($update->toArray())));
+                        }
+                    }
+                    else
+                    {
+                        // Otherwise handle it traditionally
+                        $this->bot->handleGetUpdates();
+                    }
 
                     if(time() - $last_session_save >= 15)
                     {
@@ -114,6 +150,8 @@
                         $this->session_manager->save();
                         $last_session_save = time();
                     }
+
+                    Tamer::monitor();
                 }
                 catch(Exception $e)
                 {

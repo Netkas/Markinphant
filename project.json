@@ -28,29 +28,15 @@
     },
     "execution_policies":[
         {
-            "name": "post_install",
-            "runner": "php",
-            "execute": {
-                "target": "scripts/post_install",
-                "working_directory": "%CWD%",
-                "tty": true
-            }
-        },
-        {
             "name": "main",
             "runner": "php",
             "execute": {
-                "target": "scripts/main",
+                "target": "bin/main",
                 "working_directory": "%CWD%",
                 "tty": true
             }
         }
     ],
-    "installer": {
-        "post_install": [
-            "post_install"
-        ]
-    },
     "build": {
         "source_path": "src",
         "default_configuration": "release",
