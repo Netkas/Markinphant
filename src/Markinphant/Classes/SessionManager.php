@@ -5,6 +5,7 @@
     namespace Markinphant\Classes;
 
     use Exception;
+    use LogLib\Log;
     use Markinphant\Objects\IndexEntry;
     use ncc\Exceptions\InvalidPackageNameException;
     use ncc\Exceptions\InvalidScopeException;
@@ -238,7 +239,15 @@
             foreach($this->redis->keys('chat_session:*') as $key)
             {
                 $chat_id = str_replace('chat_session:', '', $key);
-                $this->entries[$chat_id] = IndexEntry::fromArray(json_decode($this->redis->get($key), true), $chat_id);
+                $index_entry = json_decode($this->redis->get($key), true);
+
+                if($index_entry == null)
+                {
+                    Log::warning(sprintf('Index entry for chat ID %s is null', $chat_id));
+                    continue;
+                }
+
+                $this->entries[$chat_id] = IndexEntry::fromArray($index_entry, $chat_id);
             }
 
             // Save all the models to the file system
