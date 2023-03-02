@@ -243,7 +243,7 @@
 
                 if($index_entry == null)
                 {
-                    Log::warning(sprintf('Index entry for chat ID %s is null', $chat_id));
+                    Log::warning('com.netkas.markinphant', sprintf('Index entry for chat ID %s is null', $chat_id));
                     continue;
                 }
 
